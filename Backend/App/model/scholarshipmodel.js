@@ -5,6 +5,7 @@ let ScholarshipSchema=mongoose.Schema({
   provider: String,
   amount: String,
   amountValue: Number,
+currency: { type: String, default: "INR" },
   eligibility: {
     courses: [String],
     minGPA: Number,
