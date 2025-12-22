@@ -1,22 +1,33 @@
 import { useEffect, useState } from "react";
-import API from "../api";
-import ScholarshipCard from "../components/scholarshipCard";
+import Navbar from "../components/Navbar";
+import ScholarshipCard from "../components/ScholarshipCard";
+import { getSavedScholarships } from "../api";
 
 export default function SavedScholarships() {
-  const USER_ID = import.meta.env.VITE_TEST_USER_ID;
-  const [data, setData] = useState([]);
+  const [list, setList] = useState([]);
 
   useEffect(() => {
-    API.get(`/user/${USER_ID}/saved`)
-      .then(res => setData(res.data.savedScholarships));
+    getSavedScholarships().then((res) => setList(res.data));
   }, []);
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-3">Saved Scholarships</h2>
-      <div className="space-y-3">
-        {data.map(s => <ScholarshipCard  key={s._id} s={s} />)}
+    <>
+      <Navbar />
+      <div className="p-6 bg-gray-50">
+        <h1 className="text-xl font-semibold mb-4">
+          Saved Scholarships
+        </h1>
+
+        {list.length === 0 ? (
+          <p>No saved scholarships</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {list.map((s) => (
+              <ScholarshipCard key={s._id} scholarship={s} />
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }
