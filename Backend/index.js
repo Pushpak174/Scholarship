@@ -1,25 +1,27 @@
-const express=require('express')
-const mongoose=require('mongoose')
-const cors=require('cors')
-const scholarshipRouter  = require('./App/routes/scholarship')
-const userRouter = require('./App/routes/users');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
 
-require('dotenv').config()
-const app=express()
+const authRoutes = require("./App/routes/authRoutes");
+const scholarshipRoutes = require("./App/routes/scholarship");
+const matchRoutes = require("./App/routes/matchRoutes");
 
-app.use(cors())
-app.use(express.json())
+const app = express();
 
-app.use('/website/scholarship',scholarshipRouter);
-app.use('/website/user', userRouter );
+app.use(cors());
+app.use(express.json());
 
-mongoose.connect(process.env.DBURL)
-.then(()=>{
-    console.log('connected to MongoDB')
-    app.listen(process.env.PORT,()=>{
-        console.log('server is running')
-    })
-})
-.catch((err)=>{
-    console.log(err)
-})
+mongoose
+  .connect(process.env.DBURL)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("Mongo error", err));
+
+app.use("/website/auth", authRoutes);
+app.use("/website/scholarship", scholarshipRoutes);
+app.use("/website/match", matchRoutes); // ✅ THIS WAS MISSING
+
+const PORT = 8000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

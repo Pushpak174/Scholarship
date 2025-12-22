@@ -1,12 +1,23 @@
-const express=require('express');
-const { listScholarships, createScholarship, getScholarship, saveScholarship, updateScholarship, deleteScholarship } = require('../controller/scholarshipsControllers');
-const router=express.Router();
+const express = require("express");
+const router = express.Router();
 
-router.get('/',listScholarships)
-router.post('/',createScholarship)
-router.get('/:id',getScholarship)
-router.post('/:id/save',saveScholarship);
-router.put('/:id',updateScholarship)
-router.delete('/:id', deleteScholarship);
+const {
+  getScholarships,
+  saveScholarship,
+  unsaveScholarship,
+  getSavedScholarships
+} = require("../controller/scholarshipController");
 
-module.exports=router
+const auth = require("../middleware/authMiddleware");
+const optionalAuth = require("../middleware/authMiddlewareOptional");
+
+/* ---------- ROUTES ---------- */
+
+router.get("/", optionalAuth, getScholarships);
+router.get("/saved", auth, getSavedScholarships);
+
+router.post("/:id/save", auth, saveScholarship);
+router.post("/:id/unsave", auth, unsaveScholarship);
+
+module.exports = router;
+
