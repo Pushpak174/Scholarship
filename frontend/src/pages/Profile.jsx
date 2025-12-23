@@ -5,15 +5,50 @@ import { getMe, updateProfile } from "../api";
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [form, setForm] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getMe().then((res) => {
-      setUser(res.data);
-      setForm(res.data.profile);
-    });
+    getMe()
+      .then((res) => {
+        if (!res.data) {
+          setUser(null);
+          setForm(null);
+        } else {
+          setUser(res.data);
+          setForm(res.data.profile || {
+            course: "",
+            gpa: "",
+            location: "",
+            categories: [],
+          });
+        }
+      })
+      .catch(() => {
+        setUser(null);
+        setForm(null);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  if (!user || !form) return null;
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="p-6">Loading profile…</div>
+      </>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <Navbar />
+        <div className="p-6 text-red-600">
+          Please login again to view your profile.
+        </div>
+      </>
+    );
+  }
 
   const save = async () => {
     const res = await updateProfile(form);
@@ -34,7 +69,7 @@ export default function Profile() {
         <input
           className="border p-2 w-full mt-2"
           placeholder="Course"
-          value={form.course || ""}
+          value={form.course}
           onChange={(e) =>
             setForm({ ...form, course: e.target.value })
           }
@@ -43,7 +78,7 @@ export default function Profile() {
         <input
           className="border p-2 w-full mt-2"
           placeholder="CGPA"
-          value={form.gpa || ""}
+          value={form.gpa}
           onChange={(e) =>
             setForm({ ...form, gpa: e.target.value })
           }
@@ -52,7 +87,7 @@ export default function Profile() {
         <input
           className="border p-2 w-full mt-2"
           placeholder="Location"
-          value={form.location || ""}
+          value={form.location}
           onChange={(e) =>
             setForm({ ...form, location: e.target.value })
           }
@@ -61,7 +96,7 @@ export default function Profile() {
         <input
           className="border p-2 w-full mt-2"
           placeholder="Categories (SC, OBC, etc)"
-          value={(form.categories || []).join(",")}
+          value={form.categories.join(",")}
           onChange={(e) =>
             setForm({
               ...form,

@@ -6,8 +6,16 @@ import { getSavedScholarships } from "../api";
 export default function SavedScholarships() {
   const [list, setList] = useState([]);
 
+  const fetchSaved = async () => {
+    const res = await getSavedScholarships();
+    setList(res.data || []);
+  };
+
   useEffect(() => {
-    getSavedScholarships().then((res) => setList(res.data));
+    fetchSaved();
+    window.addEventListener("savedUpdated", fetchSaved);
+    return () =>
+      window.removeEventListener("savedUpdated", fetchSaved);
   }, []);
 
   return (
@@ -22,7 +30,7 @@ export default function SavedScholarships() {
           <p>No saved scholarships</p>
         ) : (
           <div className="grid grid-cols-2 gap-4">
-            {list.map((s) => (
+            {list.map(s => (
               <ScholarshipCard key={s._id} scholarship={s} />
             ))}
           </div>

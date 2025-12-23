@@ -4,12 +4,22 @@ import ScholarshipCard from "../components/ScholarshipCard";
 import { getMatchedScholarships } from "../api";
 
 export default function PersonalizedScholarships() {
-  const [scholarships, setScholarships] = useState([]);
+  const [list, setList] = useState([]);
+
+const fetchMatch = async () => {
+  try {
+    const res = await getMatchedScholarships();
+    setList(res.data || []);
+  } catch {
+    setList([]); // 🔥 SAFE FALLBACK
+  }
+};
 
   useEffect(() => {
-    getMatchedScholarships().then((res) =>
-      setScholarships(res.data)
-    );
+    fetchMatch();
+    window.addEventListener("savedUpdated", fetchMatch);
+    return () =>
+      window.removeEventListener("savedUpdated", fetchMatch);
   }, []);
 
   return (
@@ -17,15 +27,15 @@ export default function PersonalizedScholarships() {
       <Navbar />
       <div className="p-6 bg-gray-50">
         <h1 className="text-xl font-semibold mb-4">
-          Personalized Scholarships
+          Recommended Scholarships
         </h1>
 
         <div className="grid grid-cols-2 gap-4">
-          {scholarships.map((s) => (
+          {list.map(s => (
             <ScholarshipCard
               key={s._id}
               scholarship={s}
-              showMatchScore={true}
+              showMatchScore
             />
           ))}
         </div>

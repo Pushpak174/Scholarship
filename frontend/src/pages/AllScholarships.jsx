@@ -5,6 +5,7 @@ import { getAllScholarships } from "../api";
 
 export default function AllScholarships() {
   const [scholarships, setScholarships] = useState([]);
+  const [boost, setBoost] = useState(false);
 
   const [filters, setFilters] = useState({
     category: "",
@@ -14,26 +15,24 @@ export default function AllScholarships() {
     maxAmount: "",
   });
 
-  const [boost, setBoost] = useState(false);
-console.log("AllScholarships rendered");
+  const fetchData = async () => {
+    const res = await getAllScholarships(filters);
+    setScholarships(res.data.data || []);
+  };
 
-  // ================= FETCH ALL SCHOLARSHIPS =================
   useEffect(() => {
-    getAllScholarships(filters)
-      .then((res) => {
-        setScholarships(res.data.data || []);
-      })
-      .catch((err) => console.error(err));
+    fetchData();
+    window.addEventListener("savedUpdated", fetchData);
+    return () =>
+      window.removeEventListener("savedUpdated", fetchData);
   }, [filters]);
 
-  // ================= OPTIONAL BOOST SORT =================
-  const displayedScholarships = boost
+  const displayed = boost
     ? [...scholarships].sort(
         (a, b) => (b.matchScore || 0) - (a.matchScore || 0)
       )
     : scholarships;
 
-  // ================= UI =================
   return (
     <>
       <Navbar />
@@ -43,118 +42,78 @@ console.log("AllScholarships rendered");
           All Scholarships
         </h1>
 
-        {/* ================= FILTER BAR ================= */}
-        <div className="flex flex-wrap gap-3 mb-6 items-center">
-          {/* Category */}
+        {/* FILTER BAR */}
+        <div className="flex flex-wrap gap-3 mb-4">
           <select
-            value={filters.category}
             onChange={(e) =>
-              setFilters((f) => ({
-                ...f,
-                category: e.target.value,
-              }))
+              setFilters((f) => ({ ...f, category: e.target.value }))
             }
-            className="border px-2 py-1 rounded"
           >
-            <option value="">All Categories</option>
-            <option value="GEN">GEN</option>
-            <option value="OBC">OBC</option>
-            <option value="SC">SC</option>
-            <option value="ST">ST</option>
-            <option value="EWS">EWS</option>
+            <option value="">Category</option>
+            <option>GEN</option>
+            <option>OBC</option>
+            <option>SC</option>
+            <option>ST</option>
+            <option>EWS</option>
           </select>
 
-          {/* Course */}
           <select
-            value={filters.course}
             onChange={(e) =>
-              setFilters((f) => ({
-                ...f,
-                course: e.target.value,
-              }))
+              setFilters((f) => ({ ...f, course: e.target.value }))
             }
-            className="border px-2 py-1 rounded"
           >
-            <option value="">All Courses</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Science">Science</option>
-            <option value="Arts">Arts</option>
-            <option value="Commerce">Commerce</option>
-            <option value="Technology">Technology</option>
-            <option value="Any">Any</option>
+            <option value="">Course</option>
+            <option>Engineering</option>
+            <option>Science</option>
+            <option>Arts</option>
+            <option>Commerce</option>
           </select>
 
-          {/* Currency */}
           <select
-            value={filters.currency}
             onChange={(e) =>
-              setFilters((f) => ({
-                ...f,
-                currency: e.target.value,
-              }))
+              setFilters((f) => ({ ...f, currency: e.target.value }))
             }
-            className="border px-2 py-1 rounded"
           >
-            <option value="">All Currencies</option>
+            <option value="">Currency</option>
             <option value="INR">INR</option>
             <option value="USD">USD</option>
           </select>
 
-          {/* Min Amount */}
           <input
             type="number"
-            placeholder="Min Amount"
-            value={filters.minAmount}
+            placeholder="Min"
             onChange={(e) =>
-              setFilters((f) => ({
-                ...f,
-                minAmount: e.target.value,
-              }))
+              setFilters((f) => ({ ...f, minAmount: e.target.value }))
             }
-            className="border px-2 py-1 rounded w-28"
           />
 
-          {/* Max Amount */}
           <input
             type="number"
-            placeholder="Max Amount"
-            value={filters.maxAmount}
+            placeholder="Max"
             onChange={(e) =>
-              setFilters((f) => ({
-                ...f,
-                maxAmount: e.target.value,
-              }))
+              setFilters((f) => ({ ...f, maxAmount: e.target.value }))
             }
-            className="border px-2 py-1 rounded w-28"
           />
 
-          {/* Boost */}
-          {/* <label className="flex items-center gap-2 text-sm ml-2">
+          <label className="flex items-center gap-2">
             <input
               type="checkbox"
               checked={boost}
               onChange={() => setBoost(!boost)}
             />
             Boost by my profile
-          </label> */}
+          </label>
         </div>
 
-        {/* ================= LIST ================= */}
-        {displayedScholarships.length === 0 ? (
-          <p className="text-gray-600">
-            No scholarships found.
-          </p>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {displayedScholarships.map((s) => (
-              <ScholarshipCard
-                key={s._id}
-                scholarship={s}
-                showMatchScore={boost}
-              />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-4">
+          {displayed.map((s) => (
+            <ScholarshipCard
+              key={s._id}
+              scholarship={s}
+              showMatchScore={boost}
+            />
+          ))}
+        </div>
       </div>
     </>
   );

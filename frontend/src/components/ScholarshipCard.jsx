@@ -1,13 +1,8 @@
-import {
-  saveScholarship,
-  unsaveScholarship,
-} from "../api";
-import { useState } from "react";
+import { saveScholarship, unsaveScholarship } from "../api";
 
-export default function ScholarshipCard({
-  scholarship,
-  showMatchScore,
-}) {
+export default function ScholarshipCard({ scholarship, showMatchScore }) {
+  if (!scholarship) return null;
+
   const {
     _id,
     title,
@@ -22,15 +17,18 @@ export default function ScholarshipCard({
     isSaved,
   } = scholarship;
 
-  const [saved, setSaved] = useState(isSaved);
-
   const toggleSave = async () => {
-    if (saved) {
-      await unsaveScholarship(_id);
-      setSaved(false);
-    } else {
-      await saveScholarship(_id);
-      setSaved(true);
+    try {
+      if (isSaved) {
+        await unsaveScholarship(_id);
+      } else {
+        await saveScholarship(_id);
+      }
+
+      // 🔥 force global refresh
+      window.dispatchEvent(new Event("savedUpdated"));
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -86,7 +84,7 @@ export default function ScholarshipCard({
         onClick={toggleSave}
         className="mt-2 px-3 py-1 border rounded"
       >
-        {saved ? "Saved" : "Save"}
+        {isSaved ? "Saved" : "Save"}
       </button>
     </div>
   );
