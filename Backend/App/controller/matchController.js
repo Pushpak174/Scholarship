@@ -6,7 +6,14 @@ async function matchScholarships(req, res) {
     const user = await User.findById(req.userId);
 
     if (!user || !user.profile) {
-      return res.status(400).json({ error: "User profile not found" });
+      return res.json([]); // 🔥 return empty, not 400
+    }
+
+    const { course, gpa, location, categories } = user.profile;
+
+    // minimal profile required
+    if (!course || !categories || categories.length === 0) {
+      return res.json([]); // 🔥 SAFE EMPTY RESPONSE
     }
 
     const scholarships = await Scholarship.find();
@@ -24,8 +31,8 @@ async function matchScholarships(req, res) {
 
     res.json(matched);
   } catch (err) {
-    console.error("matchScholarships error:", err);
-    res.status(500).json({ error: "Match failed" });
+    console.error("match error", err);
+    res.status(500).json({ error: "Server error" });
   }
 }
 

@@ -104,14 +104,21 @@ async function unsaveScholarship(req, res) {
 /* ================= GET SAVED ================= */
 async function getSavedScholarships(req, res) {
   try {
-    const user = await User.findById(req.userId).populate(
-      "savedScholarships"
-    );
-    res.json(user?.savedScholarships || []);
+    const user = await User.findById(req.userId)
+      .populate("savedScholarships");
+
+    const data = (user.savedScholarships || []).map(s => ({
+      ...s.toObject(),
+      isSaved: true, // 🔥 REQUIRED
+    }));
+
+    res.json(data);
   } catch (err) {
+    console.error("getSavedScholarships error", err);
     res.status(500).json({ error: "Server error" });
   }
 }
+
 
 module.exports = {
   getScholarships,
