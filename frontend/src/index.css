@@ -1,1 +1,73 @@
-@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f4f1eb;
+  --bg2: #ede9e0;
+  --surface: #ffffff;
+  --surface2: #f9f7f3;
+  --border: #d8d3c8;
+  --text: #1a1814;
+  --text2: #5a5650;
+  --text3: #8a8680;
+  --accent: #c8502a;
+  --accent2: #e8703a;
+  --accent-light: #fdf0eb;
+  --green: #2a7a4a;
+  --green-light: #eaf5ee;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: 'Sora', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0f0e0c;
+  --bg2: #1a1916;
+  --surface: #242220;
+  --surface2: #1e1d1a;
+  --border: #333128;
+  --text: #f0ece4;
+  --text2: #a09c94;
+  --text3: #6a6660;
+  --accent: #e8703a;
+  --accent2: #f08050;
+  --accent-light: #2a1a10;
+  --green: #3a9a5a;
+  --green-light: #0f2a18;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
+}
+
+.toast-container {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px; border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-weight: 500;
+  box-shadow: var(--shadow-lg); animation: slideIn 0.3s ease;
+  max-width: 340px; background: var(--surface);
+  border: 1px solid var(--border); color: var(--text);
+}
+.toast.success { border-left: 4px solid var(--green); }
+.toast.error   { border-left: 4px solid #e53e3e; }
+.toast.info    { border-left: 4px solid var(--accent); }
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(60px); } }
+.toast.leaving { animation: fadeOut 0.3s ease forwards; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }

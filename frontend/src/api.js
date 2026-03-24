@@ -4,6 +4,7 @@ const API = axios.create({
   baseURL: "http://localhost:8000/website",
 });
 
+// Attach token to every request automatically
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -12,27 +13,20 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// ================= SCHOLARSHIPS =================
-export const getAllScholarships = (params = {}) =>
-  API.get("/scholarship", { params });
+/* ─── Auth ─────────────────────────────────────────── */
+export const signup = (data) => API.post("/auth/signup", data);
+export const login = (data) => API.post("/auth/login", data);
+export const getMe = () => API.get("/auth/me");
+export const updateProfile = (data) => API.put("/auth/profile", data);
 
-export const getMatchedScholarships = () =>
-  API.get("/match");
+/* ─── Scholarships ──────────────────────────────────── */
+export const getAllScholarships = (filters = {}) =>
+  API.get("/scholarship", { params: filters });
 
-export const getSavedScholarships = () =>
-  API.get("/scholarship/saved");
+export const getSavedScholarships = () => API.get("/scholarship/saved");
 
-export const saveScholarship = (id) =>
-  API.post(`/scholarship/${id}/save`);
+export const saveScholarship = (id) => API.post(`/scholarship/${id}/save`);
+export const unsaveScholarship = (id) => API.post(`/scholarship/${id}/unsave`);
 
-export const unsaveScholarship = (id) =>
-  API.post(`/scholarship/${id}/unsave`);
-
-// ================= USER =================
-export const getMe = () =>
-  API.get("/auth/me");
-
-export const updateProfile = (data) =>
-  API.put("/auth/profile", data);
-
-export default API;
+/* ─── Match ─────────────────────────────────────────── */
+export const getMatchedScholarships = () => API.get("/match");
