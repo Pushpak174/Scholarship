@@ -1,6 +1,6 @@
 # Scholarship
 Scholarship Finder — a MERN app that helps students discover, match and save scholarships tailored to their profile
-Now I'll create a much more detailed README that clearly explains the personalized scholarship matching feature:I'll generate the comprehensive README content for you that clearly explains the personalized scholarship matching feature:
+
 
 ```markdown
 # 🎓 Scholarship Finder - Intelligent Scholarship Matching Platform
