@@ -8,8 +8,8 @@ const {
   getSavedScholarships
 } = require("../controller/scholarshipController");
 
-const auth = require("../middleware/authMiddleware");
-const optionalAuth = require("../middleware/authMiddlewareOptional");
+const auth = require("../Middleware/authMiddleware");
+const optionalAuth = require("../Middleware/authMiddlewareOptional");
 
 /* ---------- ROUTES ---------- */
 
