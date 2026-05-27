@@ -1,698 +1,398 @@
-# Scholarship
-Scholarship Finder — a MERN app that helps students discover, match and save scholarships tailored to their profile
+# Scholarship Finder
 
+> A full-stack MERN application that helps students discover and apply to scholarships through intelligent profile-based matching.
 
-```markdown
-# 🎓 Scholarship Finder - Intelligent Scholarship Matching Platform
+[![Node.js](https://img.shields.io/badge/Node.js-v14+-green)](https://nodejs.org)
+[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose_v9-green)](https://mongodb.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-> **Find scholarships tailored to YOUR profile with AI-powered intelligent matching**
+---
 
-## 📌 Table of Contents
+## Table of Contents
+
 - [Overview](#overview)
-- [✨ Key Features](#key-features)
-- [🔍 How Personalized Matching Works](#-how-personalized-matching-works)
-- [📊 Matching Algorithm Breakdown](#-matching-algorithm-breakdown)
-- [🛠️ Tech Stack](#-tech-stack)
-- [📁 Project Structure](#-project-structure)
-- [🚀 Installation & Setup](#-installation--setup)
-- [📖 API Endpoints](#-api-endpoints)
-- [🎯 Usage Guide](#-usage-guide)
-- [👥 Contributing](#-contributing)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
+- [Matching Algorithm](#matching-algorithm)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+- [Database Schema](#database-schema)
+- [Contributing](#contributing)
 
 ---
 
 ## Overview
 
-**Scholarship Finder** is a MERN (MongoDB, Express, React, Node.js) application designed to revolutionize how students discover scholarships. Instead of manually browsing through thousands of opportunities, our **intelligent matching algorithm** analyzes your profile and recommends scholarships with compatibility scores.
+Scholarship Finder addresses a real pain point for students: manually sifting through hundreds of irrelevant scholarships to find the few that actually match their profile. The platform solves this by computing a compatibility score (0–100) for every scholarship against the student's academic profile — covering course, GPA, location, eligibility category, and deadline urgency — and surfacing the most relevant opportunities first.
 
-### Problem Solved
-- ❌ Students waste hours searching through irrelevant scholarships
-- ❌ Miss opportunities that match their profile
-- ❌ No personalized recommendations based on their qualifications
-- ✅ **Scholarship Finder solves this with smart, AI-powered matching!**
+**Core problem:** Students spend hours searching scholarship portals only to find most opportunities don't match their eligibility.
+
+**Solution:** A profile-aware matching engine that ranks scholarships by compatibility in real time, reducing discovery time from hours to seconds.
 
 ---
 
-## ✨ Key Features
+## Features
 
-### 1. **🎯 Personalized Scholarship Matching** (The Star Feature!)
-Our intelligent algorithm analyzes your academic profile and recommends scholarships with **match scores (0-100)**.
+### Personalized Scholarship Matching
+The primary feature. After a student completes their profile, the system scores every scholarship in the database against five weighted criteria and returns a ranked list with match scores. Students see *why* a scholarship is a good fit, not just *that* it is.
 
-#### What Gets Matched:
-- **Course Alignment** - Find scholarships for your specific field of study
-- **Academic Performance** - Filter by your GPA requirements
-- **Location Preferences** - Get scholarships available in your region
-- **Category/Reservation** - Match with scholarships for your eligibility category
-- **Deadline Urgency** - Prioritize scholarships closing soon
+### Advanced Search & Filtering
+Browse the full scholarship catalog with filters for amount range, currency (INR/USD), course/field of study, location, and eligibility category. Results can be sorted by nearest deadline.
 
-**Real World Example:**
-```
-Student Profile: Computer Science, 3.8 GPA, India, General Category
-Matched Scholarships:
-  1. Google Scholarship for CSE (Match: 95/100) ⭐⭐⭐
-  2. ONGC Merit Scholarship (Match: 88/100) ⭐⭐
-  3. Tata Trust Engineering Fund (Match: 82/100) ⭐
-```
+### Save & Track
+Bookmark scholarships for later review. The saved list persists across sessions and serves as a personal application pipeline.
 
-### 2. **🔎 Advanced Search & Filters**
-Browse all scholarships with smart filtering:
-- Filter by **amount range** (INR/USD)
-- Search by **course/field of study**
-- Filter by **location** (City/State/Country)
-- Filter by **category** (General/SC/ST/OBC)
-- Sort by **nearest deadline**
-
-### 3. **💾 Save Scholarships**
-- Bookmark scholarships for later review
-- Access your saved scholarships anytime
-- Build a personalized scholarship wishlist
-
-### 4. **👤 Complete User Profiles**
-- Store academic credentials (GPA/CGPA)
-- Set course and specialization
-- Manage eligibility categories
-- Update location preferences
-
-### 5. **🔐 Secure Authentication**
-- JWT-based authentication
-- Encrypted password storage (bcryptjs)
-- Secure cookie handling
+### Secure Authentication
+JWT-based auth with bcrypt password hashing. Tokens are stored in secure HTTP-only cookies. Rate limiting and security headers (Helmet) are applied at the middleware level.
 
 ---
 
-## 🔍 How Personalized Matching Works
+## Tech Stack
 
-### The Smart Matching Process:
+**Frontend**
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ Step 1: Student Completes Profile                      │
-├─────────────────────────────────────────────────────────┤
-│   • Course: Computer Science                            │
-│   • GPA: 3.8                                            │
-│   • Location: Mumbai, India                             │
-│   • Category: General                                   │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Step 2: System Analyzes ALL Scholarships               │
-├─────────────────────────────────────────────────────────┤
-│   Comparing with 500+ scholarship database             │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Step 3: Calculate Match Score For Each Scholarship    │
-���─────────────────────────────────────────────────────────┤
-│   ✓ Course match score: 30 points max                  │
-│   ✓ Category match score: 25 points max                │
-│   ✓ GPA match score: 20 points max                     │
-│   ✓ Location match score: 15 points max                │
-│   ✓ Deadline urgency: 10 points max                    │
-│   ─────────────────────────────                        │
-│   TOTAL: 0-100 match score                             │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│ Step 4: Results Ranked by Compatibility               │
-├─────────────────────────────────────────────────────────┤
-│   1. Google Scholarship - 95% Match ⭐⭐⭐             │
-│   2. ONGC Scholarship - 88% Match ⭐⭐                │
-│   3. TCS Scholarship - 82% Match ⭐                   │
-│   ... more scholarships                                │
-└─────────────────────────────────────────────────────────┘
-                          ↓
-                    🎉 PERFECT MATCHES!
-```
+| Technology | Purpose |
+|---|---|
+| React 19 + Vite | UI framework and build tooling |
+| React Router v7 | Client-side routing |
+| TailwindCSS v4 | Utility-first styling |
+| Axios | HTTP client |
+| Context API | Auth and theme state management |
+
+**Backend**
+
+| Technology | Purpose |
+|---|---|
+| Node.js + Express v5 | REST API server |
+| MongoDB + Mongoose v9 | Primary database and ODM |
+| JSON Web Tokens (v9) | Stateless authentication |
+| bcryptjs v3 | Password hashing |
+| Helmet v8 | HTTP security headers |
+| express-rate-limit v8 | Request throttling |
+| CORS v2 | Cross-origin resource sharing |
 
 ---
 
-## 📊 Matching Algorithm Breakdown
-
-The algorithm evaluates **5 key factors** to calculate compatibility:
-
-### 1. **📚 Course Match** (30 Points Max)
-Evaluates how well the scholarship's course requirements match the student's field:
-
-| Scenario | Points | Example |
-|----------|--------|---------|
-| Exact Match | 30 pts | CSE ↔ Computer Science Engineering |
-| Partial Match | 10 pts | "Engineering" ↔ "Computer Engineering" |
-| Broad Match (Any/All) | 15 pts | "Any Course" or "All Streams" |
-| No Course Restriction | 15 pts | Open to all students |
-
-```javascript
-// Example
-Scholarship requires: ["Computer Science", "IT", "CSE"]
-Student course: "Computer Science"
-Score: 30 points ✅ (Exact match!)
-```
-
-### 2. **🏷️ Category/Reservation Match** (25 Points Max)
-Matches eligibility categories (General, SC, ST, OBC, Minority, etc.):
-
-| Scenario | Points | Example |
-|----------|--------|---------|
-| Exact Category Match | 25 pts | Student: General → Scholarship: General |
-| General + Exact Match | 25 pts | Student: OBC → Scholarship: General/OBC |
-| General Category Open | 12 pts | Scholarship open to General category |
-| No Category Restriction | 12 pts | Scholarship open to all |
-
-```javascript
-// Example
-Scholarship categories: ["General", "ST"]
-Student category: ["General"]
-Score: 25 points ✅ (Perfect match!)
-```
-
-### 3. **📈 GPA/Merit Match** (20 Points Max)
-Compares academic performance requirements:
-
-| Scenario | Points | Example |
-|----------|--------|---------|
-| Meets Minimum GPA | 20 pts | Student 3.8 ≥ Scholarship 3.5 |
-| Within 0.5 of threshold | 8 pts | Student 3.0 vs Scholarship 3.5 |
-| No GPA Requirement | 10 pts | Scholarship accepts all |
-| Below threshold | 0 pts | Student 2.5 < Scholarship 3.5 |
-
-```javascript
-// Example
-Scholarship min GPA: 3.5
-Student GPA: 3.8
-Score: 20 points ✅ (Exceeds requirement!)
-```
-
-### 4. **📍 Location Match** (15 Points Max)
-Matches geographic eligibility:
-
-| Scenario | Points | Example |
-|----------|--------|---------|
-| Exact Location Match | 15 pts | Mumbai ↔ Mumbai |
-| State/Region Match | 15 pts | Maharashtra state match |
-| Nationwide/All India | 15 pts | "All India" scholarships |
-| No Location Restriction | 8 pts | Open to all locations |
-
-```javascript
-// Example
-Scholarship locations: ["Maharashtra", "Mumbai"]
-Student location: "Mumbai"
-Score: 15 points ✅ (Perfect match!)
-```
-
-### 5. **⏰ Deadline Urgency Bonus** (10 Points Max)
-Bonus for scholarships closing soon (time-sensitive opportunities):
-
-| Timeframe | Points | Urgency |
-|-----------|--------|---------|
-| Within 30 days | 10 pts | 🔥 Act fast! |
-| Within 90 days | 5 pts | ⏰ Apply soon |
-| More than 90 days | 0 pts | Plenty of time |
-
-```javascript
-// Example
-Deadline: 15 days from now
-Score: 10 points ✅ (Apply immediately!)
-```
-
-### Total Match Score Calculation:
+## System Architecture
 
 ```
-Total Match Score = Course Match + Category Match + GPA Match + Location Match + Deadline Urgency
-
-Maximum Score: 100 points
+Client (React + Vite)
+        │
+        │  HTTP / REST
+        ▼
+Express REST API (Node.js)
+        │
+   ┌────┴────┐
+   │         │
+Auth MW   Route Handlers
+(JWT)      │
+           ├── authController
+           ├── scholarshipController
+           ├── matchController  ◄── matchScore utility
+           └── userController
+                    │
+                    ▼
+              MongoDB (Mongoose)
+              ├── Scholarship collection
+              └── User collection
 ```
 
-### Real-World Example:
+**Request flow for personalized matching:**
 
-```
-╔═══════════════════════════════════════════════════════════════╗
-║         Scholarship: "Google Scholarship for CSE"             ║
-║                                                               ║
-║  Student Profile:                                             ║
-║    • Course: Computer Science                                 ║
-║    • GPA: 3.8/4.0                                             ║
-║    • Location: Mumbai, Maharashtra                            ║
-║    • Category: General                                        ║
-║                                                               ║
-║  Matching Breakdown:                                          ║
-║  ├─ Course (CS ↔ CSE):              30 pts ✅                │
-║  ├─ Category (General ↔ General):    25 pts ✅                │
-║  ├─ GPA (3.8 ≥ 3.5):                20 pts ✅                │
-║  ├─ Location (Mumbai match):         15 pts ✅                │
-║  ├─ Deadline (20 days left):         10 pts ✅                │
-║  ├─────────────────────────────────────────────             │
-║  │ TOTAL MATCH SCORE:              100/100 ⭐⭐⭐           │
-║  └─────────────────────────────────────────────             │
-║                                                               ║
-║  Recommendation: HIGHLY RECOMMENDED 🎯 Apply Now!           ║
-╚═══════════════════════════════════════════════════════════════╝
-```
+1. Client sends `GET /website/match` with JWT in cookie
+2. Auth middleware verifies token and attaches `req.user`
+3. `matchController` fetches the user's profile and all active scholarships
+4. `matchScore` utility computes a score for each scholarship
+5. Results are sorted by score (descending) and returned
 
 ---
 
-## 🛠️ Tech Stack
+## Matching Algorithm
 
-### **Frontend** 
-```
-React 19 + Vite
-├─ React Router v7 (Navigation & routing)
-├─ TailwindCSS v4 (Responsive styling)
-├─ Axios (API communication)
-└─ Context API (State management)
-```
+The algorithm lives in `Backend/App/utils/mathScore.js` and evaluates five weighted criteria.
 
-### **Backend**
-```
-Node.js + Express.js v5
-├─ MongoDB + Mongoose v9 (Database)
-├─ JWT v9 (Authentication)
-├─ bcryptjs v3 (Password security)
-├─ Helmet v8 (Security headers)
-├─ Express Rate Limit v8 (DDoS protection)
-└─ CORS v2 (Cross-origin requests)
-```
+**Total score: 0–100 points**
 
-### **Database Schema**
+| Criterion | Weight | Logic |
+|---|---|---|
+| Course alignment | 30 pts | Exact match → 30; partial keyword match → 10; open to all → 15 |
+| Eligibility category | 25 pts | Exact match → 25; scholarship open to all → 12 |
+| GPA / academic merit | 20 pts | Meets minimum → 20; within 0.5 of threshold → 8; no minimum → 10 |
+| Location | 15 pts | City/state match or nationwide → 15; no restriction → 8 |
+| Deadline urgency | 10 pts | ≤30 days → 10; ≤90 days → 5; >90 days → 0 |
 
-**Scholarship Model:**
-```javascript
-{
-  title: String,              // "Google Scholarship for CSE"
-  provider: String,           // "Google"
-  amount: String,             // Display: "₹1,00,000 - ₹5,00,000"
-  amountValue: Number,        // Filterable: 100000
-  currency: "INR" | "USD",
-  
-  eligibility: {
-    courses: [String],        // ["CSE", "IT", "Computer Science"]
-    minGPA: Number,           // 3.5
-    locations: [String],      // ["Mumbai", "Maharashtra", "India"]
-    categories: [String]      // ["General", "OBC", "ST"]
-  },
-  
-  deadline: Date,             // "2026-05-31"
-  description: String,
-  url: String,
-  source: String,
-  tags: [String],
-  scrapedAt: Date
-}
+**Example calculation:**
+
+```
+Student: Computer Science, GPA 3.8, Mumbai, General category
+
+Scholarship: "Google Scholarship for CSE"
+  Requirements: CSE/IT, GPA ≥ 3.5, India, General, deadline in 20 days
+
+  Course (CS ↔ CSE):             30 / 30
+  Category (General ↔ General):  25 / 25
+  GPA (3.8 ≥ 3.5):               20 / 20
+  Location (Mumbai → India):     15 / 15
+  Deadline (20 days):            10 / 10
+  ─────────────────────────────────────
+  Match score:                  100 / 100
 ```
 
-**User Model:**
-```javascript
-{
-  name: String,                 // "Priya Sharma"
-  email: String (unique),       // "priya@example.com"
-  passwordHash: String,         // bcrypt hashed
-  
-  profile: {
-    course: String,             // "BTech Computer Science"
-    gpa: Number,                // 3.8
-    location: String,           // "Mumbai, Maharashtra"
-    categories: [String]        // ["General"]
-  },
-  
-  savedScholarships: [ObjectId] // References to saved Scholarships
-}
-```
+The matching endpoint returns all scholarships with a `matchScore` field, sorted highest-to-lowest, so the client can render them ranked by relevance.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Scholarship/
-│
 ├── Backend/
 │   ├── App/
 │   │   ├── controller/
-│   │   │   ├─ authController.js           (🔐 Login/Signup logic)
-│   │   │   ├─ scholarshipController.js    (📚 Get/Save scholarships)
-│   │   │   ├─ matchController.js          (🎯 Personalized matching)
-│   │   │   └─ userController.js           (👤 User management)
-│   │   │
+│   │   │   ├── authController.js        # Registration, login, logout
+│   │   │   ├── scholarshipController.js # CRUD + save/unsave operations
+│   │   │   ├── matchController.js       # Personalized matching endpoint
+│   │   │   └── userController.js        # Profile read/update
 │   │   ├── routes/
-│   │   │   ├─ authRoutes.js               (Authentication endpoints)
-│   │   │   ├─ scholarship.js              (Scholarship endpoints)
-│   │   │   ├─ matchRoutes.js              (Matching endpoints)
-│   │   │   └─ users.js                    (User endpoints)
-│   │   │
+│   │   │   ├── authRoutes.js
+│   │   │   ├── scholarship.js
+│   │   │   ├── matchRoutes.js
+│   │   │   └── users.js
 │   │   ├── model/
-│   │   │   └─ scholarshipmodel.js         (💾 MongoDB schemas)
-│   │   │
+│   │   │   └── scholarshipmodel.js      # Mongoose schemas (User + Scholarship)
 │   │   ├── Middleware/
-│   │   │   └─ authMiddleware.js           (🔒 JWT verification)
-│   │   │
+│   │   │   └── authMiddleware.js        # JWT verification
 │   │   └── utils/
-│   │       └─ mathScore.js                (🧮 MATCHING ALGORITHM 🔑)
-│   │
-│   ├── index.js                          (🚀 Server entry point)
+│   │       └── mathScore.js             # Matching algorithm
+│   ├── index.js                         # Server entry point
 │   ├── .env
 │   └── package.json
 │
 └── frontend/
     ├── src/
     │   ├── pages/
-    │   │   ├─ Login.jsx
-    │   │   ├─ Signup.jsx
-    │   │   ├─ AllScholarships.jsx         (📚 Browse all scholarships)
-    │   │   ├─ PersonalizedScholarships.jsx (🎯 PERSONALIZED MATCHES ⭐)
-    │   │   ├─ SavedScholarships.jsx
-    │   │   └─ Profile.jsx                 (👤 User profile setup)
-    │   │
+    │   │   ├── Login.jsx
+    │   │   ├── Signup.jsx
+    │   │   ├── AllScholarships.jsx          # Browse + filter view
+    │   │   ├── PersonalizedScholarships.jsx # Ranked match results
+    │   │   ├── SavedScholarships.jsx
+    │   │   └── Profile.jsx
     │   ├── components/
-    │   │   ├─ ScholarshipCard.jsx
-    │   │   ├─ MatchScoreBadge.jsx        (Shows match percentage)
-    │   │   ├─ FilterPanel.jsx
-    │   │   ├─ ProtectedRoute.jsx
-    │   │   └─ ...
-    │   │
+    │   │   ├── ScholarshipCard.jsx
+    │   │   ├── MatchScoreBadge.jsx
+    │   │   ├── FilterPanel.jsx
+    │   │   └── ProtectedRoute.jsx
     │   ├── context/
-    │   │   ├─ ThemeContext.jsx           (Dark/Light mode)
-    │   │   └─ ToastContext.jsx           (Notifications)
-    │   │
+    │   │   ├── ThemeContext.jsx
+    │   │   └── ToastContext.jsx
     │   ├── hooks/
-    │   │   └─ useAuth.js
-    │   │
-    │   ├── App.jsx                       (🛣️ Routing & navigation)
-    │   ├── api.js                        (API client)
-    │   └── main.jsx
-    │
+    │   │   └── useAuth.js
+    │   ├── api.js                           # Axios instance + interceptors
+    │   └── App.jsx
     ├── package.json
     └── vite.config.js
 ```
 
 ---
 
-## 🚀 Installation & Setup
+## Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB (Local or Atlas)
-- npm or yarn
 
-### Backend Setup
+- Node.js v14 or higher
+- MongoDB (local instance or MongoDB Atlas)
+- npm
 
-1. **Navigate to Backend directory:**
-   ```bash
-   cd Backend
-   ```
+### Backend
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+```bash
+cd Backend
+npm install
+```
 
-3. **Create `.env` file:**
-   ```env
-   DBURL=mongodb+srv://username:password@cluster.mongodb.net/scholarship
-   JWT_SECRET=your_secret_key_here
-   PORT=8000
-   ```
+Create a `.env` file:
 
-4. **Start the server:**
-   ```bash
-   npm start
-   ```
-   Server runs on `http://localhost:8000`
+```env
+DBURL=mongodb+srv://<username>:<password>@cluster.mongodb.net/scholarship
+JWT_SECRET=your_jwt_secret
+PORT=8000
+```
 
-### Frontend Setup
+Start the server:
 
-1. **Navigate to frontend directory:**
-   ```bash
-   cd frontend
-   ```
+```bash
+npm start
+# Server: http://localhost:8000
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+### Frontend
 
-3. **Create `.env` file:**
-   ```env
-   VITE_API_URL=http://localhost:8000
-   ```
+```bash
+cd frontend
+npm install
+```
 
-4. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-   App runs on `http://localhost:5173`
+Create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+Start the dev server:
+
+```bash
+npm run dev
+# App: http://localhost:5173
+```
 
 ---
 
-## 📖 API Endpoints
+## API Reference
 
-### Authentication Endpoints
+### Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/website/auth/signup` | Register a new user |
+| POST | `/website/auth/login` | Authenticate and receive JWT cookie |
+| POST | `/website/auth/logout` | Invalidate session |
+
+### Scholarships
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/website/scholarship` | List all scholarships (supports query filters) |
+| GET | `/website/scholarship/saved` | Get authenticated user's saved scholarships |
+| POST | `/website/scholarship/:id/save` | Save a scholarship |
+| DELETE | `/website/scholarship/:id/save` | Remove a saved scholarship |
+
+**Query parameters for `GET /website/scholarship`:**
+
 ```
-POST   /website/auth/signup          Register new user
-POST   /website/auth/login           Login user
-POST   /website/auth/logout          Logout user
+?category=General
+?currency=INR
+?minAmount=50000
+?maxAmount=500000
+?course=Computer Science
+?location=Mumbai
 ```
 
-### Browse All Scholarships Endpoint
-```
-GET    /website/scholarship          Get all scholarships (with advanced filters)
+### Matching
 
-Query Parameters:
-  ?category=General
-  ?currency=INR
-  ?minAmount=50000
-  ?maxAmount=500000
-  ?course=Computer Science
-  ?location=Mumbai
+| Method | Endpoint | Description | Auth required |
+|---|---|---|---|
+| GET | `/website/match` | Return scholarships ranked by match score | Yes |
 
-Response: Array of scholarship objects with `isSaved` flag
-```
+**Sample response:**
 
-### 🌟 Personalized Matching Endpoint (CORE FEATURE!)
-```
-GET    /website/match                Get AI-powered personalized matches
-
-Response:
+```json
 [
   {
-    _id: "...",
-    title: "Google Scholarship for CSE",
-    provider: "Google",
-    amount: "₹5,00,000",
-    amountValue: 500000,
-    currency: "INR",
-    matchScore: 95,              ← ✨ MATCH SCORE (0-100)
-    eligibility: {
-      courses: ["CSE", "IT"],
-      minGPA: 3.5,
-      locations: ["India"],
-      categories: ["General"]
+    "_id": "...",
+    "title": "Google Scholarship for CSE",
+    "provider": "Google",
+    "amount": "₹5,00,000",
+    "amountValue": 500000,
+    "currency": "INR",
+    "matchScore": 95,
+    "eligibility": {
+      "courses": ["CSE", "IT"],
+      "minGPA": 3.5,
+      "locations": ["India"],
+      "categories": ["General"]
     },
-    deadline: "2026-05-31",
-    description: "...",
-    url: "...",
-    isSaved: false
-  },
-  {
-    title: "ONGC Scholarship",
-    matchScore: 88,              ← ✨ MATCH SCORE
-    ...
-  },
-  ...
+    "deadline": "2026-05-31",
+    "isSaved": false
+  }
 ]
 ```
 
-### Saved Scholarships Endpoints
-```
-GET    /website/scholarship/saved    Get user's saved scholarships
-POST   /website/scholarship/:id/save Save a scholarship
-DELETE /website/scholarship/:id/save Remove a saved scholarship
+### Users
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/website/users/profile` | Fetch authenticated user's profile |
+| PUT | `/website/users/profile` | Update profile fields |
+
+---
+
+## Database Schema
+
+### Scholarship
+
+```javascript
+{
+  title:        String,           // "Google Scholarship for CSE"
+  provider:     String,           // "Google"
+  amount:       String,           // Display string: "₹1,00,000 – ₹5,00,000"
+  amountValue:  Number,           // Numeric value for range filtering
+  currency:     "INR" | "USD",
+
+  eligibility: {
+    courses:    [String],         // ["CSE", "IT", "Computer Science"]
+    minGPA:     Number,           // 3.5
+    locations:  [String],         // ["Mumbai", "Maharashtra", "India"]
+    categories: [String]          // ["General", "OBC"]
+  },
+
+  deadline:     Date,
+  description:  String,
+  url:          String,
+  source:       String,
+  tags:         [String],
+  scrapedAt:    Date
+}
 ```
 
-### User Profile Endpoints
-```
-GET    /website/users/profile        Get user profile
-PUT    /website/users/profile        Update profile
+### User
+
+```javascript
+{
+  name:          String,
+  email:         String,           // unique index
+
+  profile: {
+    course:      String,           // "BTech Computer Science"
+    gpa:         Number,           // 3.8
+    location:    String,           // "Mumbai, Maharashtra"
+    categories:  [String]          // ["General"]
+  },
+
+  savedScholarships: [ObjectId],   // refs to Scholarship documents
+  passwordHash:  String            // bcrypt hash, never returned in API responses
+}
 ```
 
 ---
 
-## 🎯 Usage Guide - Student Journey
+## Contributing
 
-### Step 1: **Sign Up & Create Profile**
-```
-1. Click "Sign Up"
-2. Enter: Name, Email, Password
-3. Complete Profile:
-   ├─ Course: BTech Computer Science
-   ├─ GPA: 3.8
-   ├─ Location: Mumbai
-   └─ Category: General
-```
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "Add your feature"`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a Pull Request
 
-### Step 2: **Browse All Scholarships**
-```
-Navigate to "All Scholarships"
-├─ Browse 500+ scholarships
-├─ Use filters:
-│  ├─ Amount: ₹50,000 - ₹5,00,000
-│  ├─ Course: Computer Science
-│  ├─ Location: Maharashtra
-│  └─ Category: General
-├─ Sort by: Nearest Deadline
-└─ Save interesting ones
-```
+**Good areas to contribute:**
 
-### Step 3: **Get Personalized Recommendations** ⭐
-```
-Click "Personalized Matches"
-   ↓
-System analyzes YOUR profile
-   ↓
-Shows scholarships ranked by match score:
-   1. Google Scholarship - 95% Match ⭐⭐⭐
-   2. ONGC Merit - 88% Match ⭐⭐
-   3. Tata Trust - 82% Match ⭐
-   ... and more!
-   ↓
-Each shows:
-   • Title & Provider
-   • Amount & Currency
-   • Eligibility Requirements
-   • Deadline
-   • Match Score (Why it's a good match)
-   • Save/Apply buttons
-```
-
-### Step 4: **Track & Apply**
-```
-├─ Save favorite scholarships
-├─ Click "Apply" to visit scholarship website
-├─ Apply to top matches first (highest score)
-└─ Update profile if circumstances change → Get new matches!
-```
-
-### Real Example: Priya's Scholarship Journey
-
-```
-╔════════════════════════════════════════════════════════════╗
-║  Student: Priya Sharma (CS, 3.8 GPA, Mumbai, General)     ║
-╚════════════════════════════════════════════════════════════╝
-
-DAY 1:
-  • Signs up and completes profile
-  • Browses "All Scholarships" manually
-  • Finds 50+ potentially relevant scholarships
-  ⏱️ Time spent: 2 hours manually searching
-
-DAY 2:
-  • Clicks "Personalized Matches"
-  • System instantly shows TOP 10 matches:
-    
-    🥇 Google Scholarship for CSE        - 95% Match
-    🥈 Infosys Scholarship               - 92% Match
-    🥉 ONGC Merit Scholarship            - 88% Match
-    4️⃣ TCS Scholarship                   - 85% Match
-    5️⃣ Tata Trust Engineering Fund       - 83% Match
-    6️⃣ HDFC Bank Scholarship             - 80% Match
-    ... and more perfect matches!
-  
-  ✅ Result: Found best matches in 5 seconds!
-  ⏱️ Time spent: 5 minutes applying to top 5
-  📊 Saved 1 hour+ of manual searching!
-
-WEEK 2:
-  • Applies to top 3 matches
-  • Gets shortlisted for all 3!
-  • Wins Google Scholarship! 🎉
-
-RESULT:
-  ✨ Found scholarship tailored to her profile
-  ✨ Saved hours of manual searching
-  ✨ Higher success rate (focused on best matches)
-  ✨ Won scholarship! 💰
-```
+- Extend the matching algorithm with additional criteria (financial need, disability status, etc.)
+- Add email notifications for approaching deadlines
+- Build an admin panel for scholarship data management
+- Improve mobile responsiveness
+- Add multi-language support
+- Write unit tests for the matching utility
 
 ---
 
-## 🌟 Unique Advantages vs Traditional Portals
+## License
 
-| Feature | Traditional Portals | Scholarship Finder |
-|---------|:------------------:|:------------------:|
-| Browse all scholarships | ✅ | ✅ |
-| Manual filtering | ✅ Manual | ✅ Smart |
-| **Personalized matching** | ❌ | ✅ **AI-powered** |
-| **Match score** | ❌ | ✅ **0-100 score** |
-| Time to find best match | ⏱️ 2+ hours | ✨ 5 seconds |
-| Save scholarships | ❌ | ✅ Full wishlist |
-| Deadline urgency | ❌ | ✅ Bonus scoring |
-| Profile-based matching | ❌ | ✅ Dynamic |
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## 👥 Contributing
+## Author
 
-We welcome contributions! Here's how:
-
-1. **Fork the repository**
-2. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit changes:**
-   ```bash
-   git commit -m "Add amazing feature"
-   ```
-4. **Push to branch:**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. **Open a Pull Request**
-
-### Areas to Contribute:
-- 🔧 Add more filtering options
-- 🚀 Improve matching algorithm accuracy
-- 📱 Make UI more responsive
-- 🗂️ Add more scholarships to database
-- 🐛 Report and fix bugs
-- 📖 Improve documentation
-- 🌍 Add multi-language support
-
----
-
-## 📝 License
-
-This project is open-source and available under the MIT License.
-
----
-
-## 📞 Contact & Support
-
-- **GitHub**: [@Pushpak174](https://github.com/Pushpak174)
-- **Project**: [Scholarship Finder Repository](https://github.com/Pushpak174/Scholarship)
-
----
-
-## 🙏 Acknowledgments
-
-- Built with ❤️ to help students find their perfect scholarship
-- Inspired by the struggles of scholarship seekers
-- Powered by MERN Stack & Intelligent Algorithms
-- Special thanks to all contributors
-
----
-
-**Happy Scholarship Hunting! 🎓✨**
-
-*Remember: Your perfect scholarship is just a match score away!*
-```
-
-This comprehensive README:
-✅ **Clearly explains the personalized matching feature** as the main differentiator
-✅ **Shows scoring breakdown** with real examples (0-100 match scores)
-✅ **Visual representations** of the matching process
-✅ **Real-world student journey** examples
-✅ **Detailed algorithm explanation** with all 5 scoring factors
-✅ **Comparison table** showing advantages vs traditional portals
-✅ **Complete technical documentation** for developers
-✅ **Installation & setup** instructions
-✅ **API endpoint** documentation with examples
-
-Users will now clearly understand the unique "personalized scholarship matching" feature and how it saves them time and improves their chances of finding the right scholarship! 🎓✨
+[@Pushpak174](https://github.com/Pushpak174) · [GitHub Repository](https://github.com/Pushpak174/Scholarship)
